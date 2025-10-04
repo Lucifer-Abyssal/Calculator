@@ -10,17 +10,31 @@ namespace Project
     {
         int InvalidInputCheck(string text, out string message)
         {
-            message = "Ok"; 
+            // Code 0: Err: For empty input
+            // Code 1: Err: Invalid character
+            // Code 2: Err: Amount of opening brackets doesn't match amount of closing brackets
+            // Code 3: Err: Operators used incorrectly 
+            // Code 4: Err: Invalid operator placements relative to parenthesis
+            // Code 5: Err: Invalid use of decimal numbers
+            // Code 6: Err: Trailing operand
+            // Code 7: Err: Empty parenthesies
+            // Code 8: Ok
 
+            message = "Ok";
+
+            // Code 0
             if (text == "") return 0;
             text = Regex.Replace(text, @"\)\(", ")*(");
 
+            // Code 1
             if (Regex.Match(text, @"[^\d+*\-/^.()]") is Match Code1 && Code1.Success) { message = $"The input '{Code1}' is not allowed."; return 1; }
 
+            // Code 2
             int counter = default;
             foreach (Match i in Regex.Matches(text, "[()]")) counter += 1;
             if (counter % 2 != 0) { message = $"The amount of opening brackets, does not match the amount of closing brackets."; return 2; }
 
+            // Code 3
             else if (Regex.Match(text, @"([-*+/^.])\1+") is Match Code2 && Code2.Success)
             {
                 if (Code2.Value.ElementAt(0) == '-') message = $"The input '{Code2.Value}' was too long. Maybe you forgot to incase a negative number in brackets?\nEx. 2-(-1)";
@@ -28,30 +42,35 @@ namespace Project
                 return 3;
             }
 
+            // Code 4
             else if (Regex.Match(text, @"\([\^*/.]|[\^*=./+-]\)") is Match Code3 && Code3.Success)
             {
                 message = $"The input '{Code3.Value}' is a invalid use case of parenthesies.";
                 return 4;
             }
 
+            // Code 5
             else if (Regex.Match(text, @"(\d+\.(?!\d))|((?<!\d)\.\d+)|((?<!\d)\.(?!\d))") is Match Code4 && Code4.Success)
             {
                 message = $"The input '{Code4.Value}' is invalid use case of decimal numbers.";
                 return 5;
             }
 
+            // Code 6
             else if (Regex.Match(text, @"[-+*^/]$|[-+*^/]\)") is Match Code5 && Code5.Success)
             {
                 message = $"The input '{Code5.Value}' is invalid because it is not followed by an operator.";
                 return 6;
             }
 
+            // Code 7
             else if (Regex.Replace(text, @"[()]", "") == "")
             {
                 message = $"Empty parenthesies";
                 return 7;
             }
 
+            // Code 8
             return 8;
         }
         List<string> ReturnBracketed(string text)
