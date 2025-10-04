@@ -10,42 +10,49 @@ namespace Project
     {
         int InvalidInputCheck(string text, out string message)
         {
-            // Code 0: Err: For empty input
-            // Code 1: Err: Invalid character
-            // Code 2: Err: Operators used incorrectly
-            // Code 3: Err: Invalid operator placements relative to parenthesis
-            // Code 4: Err: Invalid use of decimal numbers
-            // Code 5: Err: Amount of opening brackets doesn't match amount of closing brackets
-            // Code 6: Ok
+            message = "Ok"; 
 
-            message = "Ok"; // this code is about as good as this ok
             if (text == "") return 0;
             text = Regex.Replace(text, @"\)\(", ")*(");
 
-            if (Regex.Match(text, @"[^\d+*\-/^.()]") is Match match && match.Success) { message = $"The input '{match}' is not allowed.\n\n"; return 1; }
-            else if (Regex.Match(text, @"([-*+/^.])\1+") is Match _match && _match.Success)
+            if (Regex.Match(text, @"[^\d+*\-/^.()]") is Match Code1 && Code1.Success) { message = $"The input '{Code1}' is not allowed."; return 1; }
+
+            int counter = default;
+            foreach (Match i in Regex.Matches(text, "[()]")) counter += 1;
+            if (counter % 2 != 0) { message = $"The amount of opening brackets, does not match the amount of closing brackets."; return 2; }
+
+            else if (Regex.Match(text, @"([-*+/^.])\1+") is Match Code2 && Code2.Success)
             {
-                if (_match.Value.ElementAt(0) == '-') message = $"The input '{_match.Value}' was too long. Maybe you forgot to incase a negative number in brackets?\nEx. 2-(-1)\n\n";
-                else message = $"The input '{_match.Value}' was too long.\nCorrect: '{_match.Value.ElementAt(0)}'\n\n";
-                return 2;
-            }
-            else if (Regex.Match(text, @"\([\^*/.]|[\^*=./+-]\)") is Match __match && __match.Success)
-            {
-                message = $"The input '{__match.Value}' is a invalid use case of parenthesies.\n\n";
+                if (Code2.Value.ElementAt(0) == '-') message = $"The input '{Code2.Value}' was too long. Maybe you forgot to incase a negative number in brackets?\nEx. 2-(-1)";
+                else message = $"The input '{Code2.Value}' was too long.\nCorrect: '{Code2.Value.ElementAt(0)}'";
                 return 3;
             }
-            else if (Regex.Match(text, @"(\d+\.(?!\d))|((?<!\d)\.\d+)|((?<!\d)\.(?!\d))") is Match ___match && ___match.Success)
+
+            else if (Regex.Match(text, @"\([\^*/.]|[\^*=./+-]\)") is Match Code3 && Code3.Success)
             {
-                message = $"The input '{___match.Value}' is invalid use case of decimal numbers.\n\n";
+                message = $"The input '{Code3.Value}' is a invalid use case of parenthesies.";
                 return 4;
             }
-            else
+
+            else if (Regex.Match(text, @"(\d+\.(?!\d))|((?<!\d)\.\d+)|((?<!\d)\.(?!\d))") is Match Code4 && Code4.Success)
             {
-                int counter = default;
-                foreach (Match i in Regex.Matches(text, "[()]")) counter += 1;
-                if (counter % 2 != 0) { message = $"The amount of opening brackets, does not match the amount of closing brackets.\n\n"; return 5; }
+                message = $"The input '{Code4.Value}' is invalid use case of decimal numbers.";
+                return 5;
             }
-            return 6;
+
+            else if (Regex.Match(text, @"[-+*^/]$|[-+*^/]\)") is Match Code5 && Code5.Success)
+            {
+                message = $"The input '{Code5.Value}' is invalid because it is not followed by an operator.";
+                return 6;
+            }
+
+            else if (Regex.Replace(text, @"[()]", "") == "")
+            {
+                message = $"Empty parenthesies";
+                return 7;
+            }
+
+            return 8;
         }
         List<string> ReturnBracketed(string text)
         {
@@ -218,7 +225,7 @@ namespace Project
 
             text = Regex.Replace(text, " ", "");
 
-            if (InvalidInputCheck(text, out string _message) is int errCode && errCode != 6)
+            if (InvalidInputCheck(text, out string _message) is int errCode && errCode != 8)
             {
                 success = false;
                 message = _message;
