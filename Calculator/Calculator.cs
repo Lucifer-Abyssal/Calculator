@@ -301,7 +301,7 @@ namespace Project
             else { Equation = userInput; return 1; }
         }
     }
-    internal class Calculator
+    internal class Start
     {
         static void Main()
         {
