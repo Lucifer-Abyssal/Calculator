@@ -185,7 +185,7 @@ namespace Project
             }
             return list[0];
         }
-        double ReturnAnswer(List<string> list, out bool success)
+        double ReturnAnswer(List<string> list, out bool success) // I absolutely forgot why this exists
         {
             int counter = default;
             Regex regex = new Regex(@"[()]");
@@ -224,9 +224,7 @@ namespace Project
                 message = _message;
                 return errCode;
             }
-
-            List<string> bracketed = ReturnBracketed(text);
-            double result = ReturnAnswer(bracketed, out bool _success);
+            double result = ReturnAnswer(ReturnBracketed(text), out bool _success);
             if (!_success) { message = "You're equation evaluates to a number too big. Overflow.\n\n"; success = false; return 0; }
             return result;
         }
@@ -240,11 +238,11 @@ namespace Project
         private bool Exit = false;
         private bool ResultSuccess;
         private string ResultError;
-        private List<string> HistoryList = new List<string>();
+        private List<string> HistoryList = new List<string>() { "1. '1+1' = '2'" };
         private double Result => advParse.EvaluateEquasion(Equation, out ResultSuccess, out ResultError);
         string ParseInput(string input)
         {
-            switch(input)
+            switch(input.ToLower())
             {
                 case "help":
                     UpdateMessage += "Firstly,\nthis calculator allows parenthesis, exponentation, multiplication, division, addition, subtraction.\n\nSecondly,\nThe commands available to you are 'help', 'history', 'stats' and 'exit'\n\n";
@@ -264,13 +262,15 @@ namespace Project
         }
         void History(string option)
         {
-            if (option == "Add")
+            if (option == "Add") // This is..... But it works!
             {
-                HistoryList.Add($"{HistoryList.Count + 1}. '{Equation}' = '{Result}'");
+                string historyToAdd = $"'{Equation}' = '{Result}'";
+                if (HistoryList.Last() == $"{HistoryList.Count}. {historyToAdd}") return;
+                else HistoryList.Add($"{HistoryList.Count + 1}. {historyToAdd}");
             }
             else if (option == "Return")
             {
-                UpdateMessage += "\n\nCurrent history:\n";
+                UpdateMessage += "Current history:\n";
                 foreach (string s in HistoryList) UpdateMessage += $"{s}\n";
             }
             else return;
@@ -278,11 +278,19 @@ namespace Project
         void StartingMessage() // Needs some work
         {
             double grabResult = Result; // Even though 'Equation' is initialized before 'Result', it still causes advParse.EvaluateEquation to take an empty string at startup, which this solves.
-                                        // I tried setting ResultError to true on initialization, but it doesn't help
+                                        // I tried setting ResultError to true on initialization, but it didn't help
             if (UpdateMessage == "") Console.Write($"Input an equation or,\nwrite 'help' for more info.");
-            else { Console.Write(UpdateMessage); UpdateMessage = ""; };
+            else 
+            { 
+                Console.Write(UpdateMessage);
+                UpdateMessage = "";
+            }
             if (!ResultSuccess) Console.Write($"\n\nYour current equation is invalid.\n\n'{Equation}'\nErr Code {grabResult}: {ResultError}");
-            else Console.Write($"\n\nCurrent equation: {Equation}\nAnswer: {grabResult}\n\n");
+            else
+            {
+                Console.Write($"\n\nCurrent equation: {Equation}\nAnswer: {grabResult}\n\n");
+                History("Add");
+            }
             Console.Write("> ");
         }
 
@@ -292,7 +300,6 @@ namespace Project
 
             Console.Clear();
             StartingMessage();
-            History("Add");
 
             string userInput = Console.ReadLine();
 
@@ -319,7 +326,7 @@ namespace Project
         }
     }
     // Todo:
-    // 1. Make a working history list.
+    // 1. COMPLETE: Make a working history list.
     // 2. Learn how to make a real UI, no more console.
     // 3. Do extensive tests to check where I can improve AdvancedParser
     // 4. Add some fun and random things
