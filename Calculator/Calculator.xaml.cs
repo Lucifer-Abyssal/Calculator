@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace Project
 {
-    internal class AdvancedParser // Honestly, this took two days to figure out
+    internal class AdvancedParser // Parse simple math equations
     {
         int InvalidInputCheck(string text, out string message)
         {
@@ -77,9 +77,8 @@ namespace Project
         }
         List<string> ReturnBracketed(string text)
         {
-            // before i knew of depth search first, i made it myself
-            // it goes the down the bracket nest levels and adds to matches until it reaches a level without brackets
-            // if so, it removes that level, and removes that level from its parent level, and continues.
+            // Depth First Search, extracting what is inside each level of parenthesies
+            // Ex. An input of "2*(1+2+(2/1)^2)" would return "'2*(1+2+(2/1)^2)', '1+2+(2/1)^2', '2/1'"
 
             string _text = text;
             List<string> matches = new List<string>();
@@ -149,8 +148,7 @@ namespace Project
         }
         dynamic ParseUnaryMinus(List<dynamic> list)
         {
-            if (list.Count > 1) if (list[0] is string && list[0] == "-" && list[1] is double) { list[0] = list[1] * -1; list.RemoveAt(1); } // shity edge case detector 9000
-                                                                                                                                            // wait it doesnt fucking work for '2-(-1)', I NEED TWO SHITTY EDGE CASE DETECTORS
+            if (list.Count > 1) if (list[0] is string && list[0] == "-" && list[1] is double) { list[0] = list[1] * -1; list.RemoveAt(1); }
             if (list.Count > 2) for (int i = 0; i < list.Count - 2; i++) if (list[i] is string && list[i + 1] is string s && s == "-" && list[i + 2] is double d) { list[i + 1] = d * -1; list.RemoveAt(i + 2); }
             return list;
         }
@@ -158,7 +156,7 @@ namespace Project
         {
             double result = default;
 
-            if (list.Count == 2)                                // handle cases where a input of 2-(-(-1)) turned into ReturnResult receiving a list with "-", "-", 1
+            if (list.Count == 2) // handle cases where a input of "2-(-(-1))" turned into ReturnResult receiving a list with "'-', '-', 1"
             {
                 switch (list[0])
                 {
@@ -228,11 +226,11 @@ namespace Project
                 if (!match.Success)
                 {
                     double result = ReturnResult(ReturnStringListed(text, out bool _success));
-                    if (!_success) { success = false; return 0; }                                                           // overflow check
+                    if (!_success) { success = false; return 0; } // overflow check
 
                     Regex rgx = new Regex($@"\({Regex.Escape(text)}\)");
                     for (int i = counter - 1; i != -1; i--) list[i] = rgx.Replace(list[i], Convert.ToString(result), 1);
-                    list.RemoveAt(counter);                                                                                 // DO NOT, remove this line, otherwise it will be indefinitely stuck
+                    list.RemoveAt(counter); // DO NOT, remove this line, otherwise it will be indefinitely stuck
                     counter = 0;
                 }
                 else counter++;
@@ -253,7 +251,7 @@ namespace Project
                 return errCode;
             }
             double result = ReturnAnswer(ReturnBracketed(text), out bool _success);
-            if (!_success) { message = "You're equation evaluates to a number too big. Overflow.\n\n"; success = false; return 0; }
+            if (!_success) { message = "You're equation evaluates to a number too big to calculate."; success = false; return 0; }
             return result;
         }
     }
@@ -263,7 +261,7 @@ namespace Project
         private List<string> HistoryList = new List<string>();
         private string History(string option, string input = "", double result = 0)
         {
-            if (option == "Add") // This is..... But it works!
+            if (option == "Add")
             {
                 string historyToAdd = $"'{input}' = '{result}'";
                 if (HistoryList.Count == 0) HistoryList.Add($"{HistoryList.Count + 1}. {historyToAdd}");
