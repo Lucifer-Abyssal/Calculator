@@ -6,7 +6,7 @@ using System.Xml;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Calculator
+namespace Project
 {
     internal class AdvancedParser // Honestly, this took two days to figure out
     {
