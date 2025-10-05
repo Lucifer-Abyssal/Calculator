@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{807ABB99-7C5C-4B4D-9F20-EB009363DECF}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>Calculator</RootNamespace>
     <AssemblyName>Calculator</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
@@ -46,10 +46,23 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Calculator.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<ApplicationDefinition Include="App.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</ApplicationDefinition>
+		<Compile Include="App.xaml.cs">
+			<DependentUpon>App.xaml</DependentUpon>
+		</Compile>
+		<Page Include="Calculator.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Page>
+		<Compile Include="Calculator.xaml.cs">
+			<DependentUpon>Calculator.xaml</DependentUpon>
+		</Compile>
+		<Compile Include="Properties\AssemblyInfo.cs" />
+	</ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace Project
 {
@@ -255,106 +257,61 @@ namespace Project
             return result;
         }
     }
-    internal class Calculator
+    public partial class Calculator : Window
     {
         AdvancedParser advParse = new AdvancedParser();
-
-        private string Equation = "1+1";
-        private string UpdateMessage = "";
-        private bool Exit = false;
-        private bool ResultSuccess;
-        private string ResultError;
-        private List<string> HistoryList = new List<string>() { "1. '1+1' = '2'" };
-        private double Result => advParse.EvaluateEquasion(Equation, out ResultSuccess, out ResultError);
-        string ParseInput(string input)
-        {
-            switch(input.ToLower())
-            {
-                case "help":
-                    UpdateMessage += "Firstly,\nthis calculator allows parenthesis, exponentation, multiplication, division, addition, subtraction.\n\nSecondly,\nThe commands available to you are 'help', 'history', 'stats' and 'exit'\n\n";
-                    break;
-                case "history":
-                    History("Return");
-                    break;
-                case "stats":
-                    break;
-                case "exit":
-                    Exit = true;
-                    break;
-                default:
-                    return "Invalid";
-            }
-            return "Ok";
-        }
-        void History(string option)
+        private List<string> HistoryList = new List<string>();
+        private string History(string option, string input = "", double result = 0)
         {
             if (option == "Add") // This is..... But it works!
             {
-                string historyToAdd = $"'{Equation}' = '{Result}'";
-                if (HistoryList.Last() == $"{HistoryList.Count}. {historyToAdd}") return;
-                else HistoryList.Add($"{HistoryList.Count + 1}. {historyToAdd}");
+                string historyToAdd = $"'{input}' = '{result}'";
+                if (HistoryList.Count == 0) HistoryList.Add($"{HistoryList.Count + 1}. {historyToAdd}");
+                else if (!(HistoryList.Last() == $"{HistoryList.Count}. {historyToAdd}"))
+                {
+                    HistoryList.Add($"{HistoryList.Count + 1}. {historyToAdd}");
+                }
             }
             else if (option == "Return")
             {
-                UpdateMessage += "Current history:\n";
-                foreach (string s in HistoryList) UpdateMessage += $"{s}\n";
+                string returnString = "Current history:\n";
+                foreach (string s in HistoryList) returnString += $"{s}\n";
+                return returnString;
             }
-            else return;
+            return "";
         }
-        void StartingMessage() // Needs some work
+        public Calculator()
         {
-            double grabResult = Result; // Even though 'Equation' is initialized before 'Result', it still causes advParse.EvaluateEquation to take an empty string at startup, which this solves.
-                                        // I tried setting ResultError to true on initialization, but it didn't help
-            if (UpdateMessage == "") Console.Write($"Input an equation or,\nwrite 'help' for more info.");
-            else 
-            { 
-                Console.Write(UpdateMessage);
-                UpdateMessage = "";
-            }
-            if (!ResultSuccess) Console.Write($"\n\nYour current equation is invalid.\n\n'{Equation}'\nErr Code {grabResult}: {ResultError}");
-            else
+            InitializeComponent();
+        }
+        private void Button_Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+        private void Tab_Change(object sender, SelectionChangedEventArgs e)
+        {
+            TabControl tabControl = sender as TabControl;
+            if (tabControl.SelectedIndex == 1) HistoryText.Text = History("Return");
+        }
+        private void InputBox_Change(object sender, TextChangedEventArgs e)
+        {
+            string input = InputBox.Text;
+            bool success = true;
+            string errorMessage = "";
+            double result = advParse.EvaluateEquasion(input, out success, out errorMessage);
+            if (success)
             {
-                Console.Write($"\n\nCurrent equation: {Equation}\nAnswer: {grabResult}\n\n");
-                History("Add");
+                OutputText.Text = $"{input} = {result}";
+                History("Add", input, result);
             }
-            Console.Write("> ");
-        }
-
-        public int UpdateDisplay() // Could be better
-        {
-            if (Exit) return 0;
-
-            Console.Clear();
-            StartingMessage();
-
-            string userInput = Console.ReadLine();
-
-            if (String.IsNullOrEmpty(userInput)) return 1;
-            else if (ParseInput(userInput) == "Ok") return 1;
-            else { Equation = userInput; return 1; }
-        }
-    }
-    internal class Start
-    {
-        static void Main()
-        {
-
-            Calculator calculator = new Calculator();
-
-            Console.Write("Welcome to Calculator.exe!\n\n\nPress enter to continue\n> ");
-            Console.ReadLine();
-
-            while (calculator.UpdateDisplay() != 0) ;
-
-            Console.Clear();
-            Console.Write("Exited\n> ");
-            Console.ReadLine();
+            else OutputText.Text = $"{errorMessage}";
         }
     }
     // Todo:
     // 1. COMPLETE: Make a working history list.
-    // 2. Learn how to make a real UI, no more console.
-    // 3. Do extensive tests to check where I can improve AdvancedParser
-    // 4. Add some fun and random things
-    // 5. Add easter eggs
+    // 2. COMPLETE: Learn how to make a real UI, no more console.
+    // 3. Improve UI extensively
+    // 4. Do extensive tests to check where I can improve AdvancedParser
+    // 5. Add some fun and random things
+    // 6. Add easter eggs
 }
