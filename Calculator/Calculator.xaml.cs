@@ -309,8 +309,9 @@ namespace Project
     }
     // Todo:
     // 1. COMPLETE: Make a working history list.
-    // 2. Learn how to make a real UI, no more console.
-    // 3. Do extensive tests to check where I can improve AdvancedParser
-    // 4. Add some fun and random things
-    // 5. Add easter eggs
+    // 2. COMPLETE: Learn how to make a real UI, no more console.
+    // 3. Improve UI extensively
+    // 4. Do extensive tests to check where I can improve AdvancedParser
+    // 5. Add some fun and random things
+    // 6. Add easter eggs
 }
