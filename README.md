@@ -1,5 +1,13 @@
 # Calculator
 
-*This is a repo made for my own learning purposes: Learn git.*
+This repository is for my learning purposes!
 
-Calculator.sln is within Calculator/
+It is a simple calculator, that can handle:
+- Addition
+- Subtraction
+- Multiplication
+- Division
+- Exponentation
+- Parenthesies
+
+*And obviously, negative and floating point numbers.*
