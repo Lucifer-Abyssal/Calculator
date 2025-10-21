@@ -261,20 +261,21 @@ namespace Project
         private List<string> HistoryList = new List<string>();
         private string History(string option, string input = "", double result = 0)
         {
-            if (option == "Add")
+            switch (option)
             {
-                string historyToAdd = $"'{input}' = '{result}'";
-                if (HistoryList.Count == 0) HistoryList.Add($"{HistoryList.Count + 1}. {historyToAdd}");
-                else if (!(HistoryList.Last() == $"{HistoryList.Count}. {historyToAdd}"))
-                {
-                    HistoryList.Add($"{HistoryList.Count + 1}. {historyToAdd}");
-                }
-            }
-            else if (option == "Return")
-            {
-                string returnString = "Current history:\n";
-                foreach (string s in HistoryList) returnString += $"{s}\n";
-                return returnString;
+                case "Add":
+                    string historyToAdd = $"'{input}' = '{result}'";
+                    if (HistoryList.Count == 0) HistoryList.Add($"{HistoryList.Count + 1}. {historyToAdd}");
+                    else if (!(HistoryList.Last() == $"{HistoryList.Count}. {historyToAdd}"))
+                    {
+                        HistoryList.Add($"{HistoryList.Count + 1}. {historyToAdd}");
+                    }
+                    break;
+
+                case "Return":
+                    string returnString = "Current history:\n";
+                    foreach (string s in HistoryList) returnString += $"{s}\n";
+                    return returnString;
             }
             return "";
         }
